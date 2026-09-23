@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Pragati - Our 3 Years</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        :root {
+            --page-bg: #fffbf0;
+            --book-cover: #e17055;
+            --book-spine: #d63031;
+        }
+
+        body {
+            background-color: #fdf2f8;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        .font-writing {
+            font-family: 'Caveat', cursive;
+        }
+
+        .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0% { transform: translateY(0) scale(1) rotate(0deg); opacity: 0; }
+            20% { opacity: 0.6; }
+            80% { opacity: 0.6; }
+            100% { transform: translateY(-100vh) scale(1.5) rotate(45deg); opacity: 0; }
+        }
+        .animate-float {
+            animation: float linear infinite;
+        }
+        
+        @keyframes slideUpFade {
+            0% { transform: translateY(30px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        .animate-slide-up {
+            animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .animate-fade-in {
+            animation: fadeIn 1.2s ease-out forwards;
+        }
+
+        @keyframes pulseSoft {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        /* Overthinking Text Transitions */
+        .fade-text {
+            transition: opacity 600ms ease, transform 600ms ease;
+        }
+        .fade-text.entering {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+        .fade-text.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .fade-text.exiting {
+            opacity: 0;
+            transform: translateY(-15px);
+        }
+
+        /* 3D Flipbook Styles */
+        .book-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 0;
+            overflow: hidden;
+        }
+
+        .book-container {
+            width: 800px;
+            height: 500px;
+            position: relative;
+            perspective: 2000px;
+            transform-style: preserve-3d;
+            transform-origin: center center;
+            transition: transform 0.3s ease;
+        }
+
+        .book-page {
+            position: absolute;
+            width: 50%;
+            height: 100%;
+            top: 0;
+            right: 0;
+            transform-origin: left center;
+            transform-style: preserve-3d;
+            transition: transform 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+            z-index: 1;
+        }
+
+        .book-page.flipped {
+            transform: rotateY(-180deg);
+        }
+
+        .page-front, .page-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            background-color: var(--page-bg);
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+            /* Paper Texture */
+            background-image: 
+                linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%),
+                url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+        }
+
+        /* Spine shading */
+        .page-front {
+            background-image: linear-gradient(to right, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 10%), var(--page-bg);
+        }
+        .page-back {
+            transform: rotateY(180deg);
+            background-image: linear-gradient(to left, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 10%), var(--page-bg);
+        }
+
+        .book-cover {
+            background: linear-gradient(135deg, #fbc2eb 0%, #a18cd1 100%);
+            border-radius: 0 16px 16px 0;
+            box-shadow: 10px 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .book-cover.page-back {
+            border-radius: 16px 0 0 16px;
+            background: #fdfbf7;
+        }
+
+        .page-content {
+            width: 100%;
+            height: 100%;
+            padding: 2.5rem;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Polaroid Image Frame */
+        .polaroid {
+            background: #fff;
+            padding: 12px 12px 45px 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1), 0 10px 25px rgba(0,0,0,0.05);
+            position: relative;
+            border: 1px solid #f0f0f0;
+            transition: transform 0.3s ease;
+        }
+        
+        .polaroid:hover {
+            transform: scale(1.02) rotate(1deg);
+        }
+
+        .polaroid-tape {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-3deg);
+            width: 80px;
+            height: 25px;
+            background-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            backdrop-filter: blur(2px);
+            border: 1px solid rgba(255,255,255,0.5);
+            z-index: 10;
+        }
+
+        /* Avatar SVG Animations Controlled by Classes */
+        #avatar-svg .eye-open { display: block; }
+        #avatar-svg .eye-closed { display: none; }
+        #avatar-svg .blush { opacity: 0; transition: opacity 1s; }
+        #avatar-svg .smile-normal { display: block; }
+        #avatar-svg .smile-wide { display: none; }
+        
+        #avatar-svg.step-2 .eye-open { display: none; }
+        #avatar-svg.step-2 .eye-closed { display: block; }
+        #avatar-svg.step-2 .blush { opacity: 0.8; }
+        #avatar-svg.step-2 .smile-normal { display: none; }
+        #avatar-svg.step-2 .smile-wide { display: block; }
+
+        #avatar-svg .boy-arm {
+            transform-origin: 25px 85px;
+            transform: rotate(0deg);
+            transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        #avatar-svg.step-1 .boy-arm,
+        #avatar-svg.step-2 .boy-arm {
+            transform: rotate(-35deg);
+        }
+
+        #avatar-svg .floating-heart {
+            opacity: 0;
+            transform: scale(0) translateY(0);
+        }
+
+        @keyframes heartPopSVG {
+            0% { transform: scale(0) translateY(0); opacity: 0; }
+            50% { transform: scale(1.2) translateY(-20px); opacity: 1; }
+            100% { transform: scale(1) translateY(-40px); opacity: 0; }
+        }
+
+        #avatar-svg.step-2 .heart-1 { animation: heartPopSVG 2s ease-out forwards; }
+        #avatar-svg.step-2 .heart-2 { animation: heartPopSVG 2.5s ease-out 0.2s forwards; }
+        #avatar-svg.step-2 .heart-3 { animation: heartPopSVG 2.2s ease-out 0.4s forwards; }
+
+        /* Scrollbar hiding for descriptions */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="selection:bg-rose-200 selection:text-rose-900">
+
+    <!-- Floating Hearts Container -->
+    <div id="floating-hearts-container" class="fixed inset-0 pointer-events-none overflow-hidden z-0"></div>
+
+    <!-- WELCOME SCREEN -->
+    <div id="welcome-screen" class="min-h-screen flex flex-col items-center justify-center relative px-4">
+        <div class="z-10 bg-white/60 backdrop-blur-md p-8 md:p-12 rounded-[3rem] shadow-2xl border border-rose-100 max-w-2xl w-full text-center flex flex-col items-center animate-slide-up">
+            <h1 class="text-4xl md:text-5xl font-serif font-bold text-gray-800 mb-2 flex items-center justify-center gap-2">
+                Hello, Pragati <i data-lucide="sparkles" class="text-rose-400 w-8 h-8"></i>
+            </h1>
+            <p class="font-writing text-2xl md:text-3xl text-gray-600 mb-8">
+                A little something for you...
+            </p>
+
+            <!-- SVG Avatar Animation -->
+            <div class="w-full max-w-md mx-auto aspect-video relative flex justify-center items-center">
+                <svg id="avatar-svg" viewBox="0 0 500 350" class="w-full h-full drop-shadow-2xl overflow-visible">
+                    <defs>
+                        <linearGradient id="skin" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#ffdcb1" />
+                            <stop offset="100%" stop-color="#f4c297" />
+                        </linearGradient>
+                        <linearGradient id="girlOutfit" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#f472b6" />
+                            <stop offset="100%" stop-color="#db2777" />
+                        </linearGradient>
+                        <linearGradient id="boyOutfit" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#38bdf8" />
+                            <stop offset="100%" stop-color="#0284c7" />
+                        </linearGradient>
+                    </defs>
+
+                    <!-- GIRL AVATAR (Right Side) -->
+                    <g transform="translate(280, 100)">
+                        <path d="M-40,20 C-60,80 -50,150 -30,180 C-10,180 10,150 20,100 Z" fill="#2d1b0e"/>
+                        <path d="M40,20 C60,80 50,150 30,180 C10,180 -10,150 -20,100 Z" fill="#2d1b0e"/>
+                        <rect x="-35" y="80" width="70" height="90" rx="20" fill="url(#girlOutfit)" />
+                        <circle cx="0" cy="40" r="45" fill="url(#skin)" />
+                        
+                        <!-- Eyes -->
+                        <g class="eye-open">
+                            <circle cx="-15" cy="35" r="5" fill="#333" />
+                            <circle cx="15" cy="35" r="5" fill="#333" />
+                            <path d="M-22,30 Q-15,25 -8,30" stroke="#333" stroke-width="2" fill="none"/>
+                            <path d="M8,30 Q15,25 22,30" stroke="#333" stroke-width="2" fill="none"/>
+                        </g>
+                        <g class="eye-closed">
+                            <path d="M-22,35 Q-15,28 -8,35" stroke="#333" stroke-width="3" stroke-linecap="round" fill="none"/>
+                            <path d="M8,35 Q15,28 22,35" stroke="#333" stroke-width="3" stroke-linecap="round" fill="none"/>
+                        </g>
+
+                        <circle cx="-25" cy="45" r="8" fill="#ff8ba7" class="blush" />
+                        <circle cx="25" cy="45" r="8" fill="#ff8ba7" class="blush" />
+
+                        <path d="M-8,52 Q0,58 8,52" stroke="#333" stroke-width="2.5" stroke-linecap="round" fill="none" class="smile-normal" />
+                        <path d="M-10,50 Q0,65 10,50" stroke="#333" stroke-width="2.5" stroke-linecap="round" fill="none" class="smile-wide" />
+
+                        <path d="M-45,30 C-40,-20 40,-20 45,30 C45,10 20,-5 0,-5 C-20,-5 -45,10 -45,30 Z" fill="#3d2616" />
+                    </g>
+
+                    <!-- BOY AVATAR (Left Side) -->
+                    <g transform="translate(180, 105)">
+                        <rect x="-35" y="75" width="70" height="90" rx="20" fill="url(#boyOutfit)" />
+                        <circle cx="0" cy="35" r="45" fill="url(#skin)" />
+                        <path d="M-40,30 C-50,-10 -20,-20 0,-20 C20,-20 50,-10 40,30 C30,0 10,-5 0,-5 C-10,-5 -30,0 -40,30 Z" fill="#4a3018" />
+                        <path d="M-20,-15 Q0,-30 20,-15 Q0,-25 -20,-15 Z" fill="#4a3018" />
+                        <circle cx="-15" cy="30" r="4" fill="#333" />
+                        <circle cx="15" cy="30" r="4" fill="#333" />
+                        <path d="M-10,45 Q0,55 10,45" stroke="#333" stroke-width="2.5" stroke-linecap="round" fill="none" />
+                        <rect x="-45" y="80" width="15" height="50" rx="7.5" fill="url(#boyOutfit)" transform="rotate(15 -45 80)" />
+
+                        <!-- Animated Right Arm holding flowers -->
+                        <g class="boy-arm">
+                            <rect x="25" y="80" width="15" height="55" rx="7.5" fill="url(#boyOutfit)" />
+                            <path d="M25,130 L40,130 L32,160 Z" fill="#4ade80" />
+                            <circle cx="28" cy="125" r="7" fill="#e11d48" />
+                            <circle cx="42" cy="128" r="6" fill="#fb7185" />
+                            <circle cx="35" cy="120" r="8" fill="#be123c" />
+                            <circle cx="35" cy="132" r="5" fill="#f43f5e" />
+                        </g>
+                    </g>
+
+                    <!-- Floating Hearts Animation -->
+                    <g>
+                        <path d="M250,150 A5,5 0 0,0 260,150 A5,5 0 0,0 270,150 Q260,165 250,150 Z" fill="#ec4899" class="floating-heart heart-1" />
+                        <path d="M260,130 A4,4 0 0,0 268,130 A4,4 0 0,0 276,130 Q268,142 260,130 Z" fill="#f43f5e" class="floating-heart heart-2" />
+                        <path d="M270,160 A6,6 0 0,0 282,160 A6,6 0 0,0 294,160 Q282,175 270,160 Z" fill="#fb7185" class="floating-heart heart-3" />
+                    </g>
+                </svg>
+            </div>
+
+            <button onclick="enterMainApp()" class="mt-12 bg-gradient-to-r from-rose-400 to-pink-500 text-white font-serif font-bold text-xl px-10 py-4 rounded-full shadow-[0_0_20px_rgba(2fb,113,133,0.4)] hover:shadow-[0_0_30px_rgba(2fb,113,133,0.6)] hover:scale-105 transition-all flex items-center gap-2 group mx-auto">
+                Open Our Diary 
+                <i data-lucide="chevron-right" class="w-6 h-6 group-hover:translate-x-1 transition-transform"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="main-app" class="hidden min-h-screen relative pb-20">
+        
+        <!-- Book Section -->
+        <section class="py-20 relative z-10 w-full overflow-hidden flex flex-col items-center">
+            <div class="text-center mb-8 px-4">
+                <h2 class="text-4xl md:text-5xl font-serif font-bold text-gray-800 flex items-center justify-center gap-3 drop-shadow-sm">
+                    <i data-lucide="book-open" class="text-rose-500 w-8 h-8 md:w-10 md:h-10"></i> The Chapters of Us
+                </h2>
+                <p class="text-gray-600 mt-4 font-writing text-3xl">Flip through our pages...</p>
+            </div>
+
+            <!-- Book Controls -->
+            <div class="flex items-center gap-6 mb-8 bg-white/50 backdrop-blur-md px-6 py-3 rounded-full shadow-sm border border-rose-100 z-20">
+                <button onclick="turnPrev()" id="btn-prev" class="p-2 text-rose-500 disabled:opacity-30 hover:bg-rose-100 rounded-full transition-colors disabled:cursor-not-allowed">
+                    <i data-lucide="chevron-left" class="w-6 h-6"></i>
+                </button>
+                <span id="page-indicator" class="font-serif font-medium text-gray-700 min-w-[100px] text-center">
+                    Cover
+                </span>
+                <button onclick="turnNext()" id="btn-next" class="p-2 text-rose-500 disabled:opacity-30 hover:bg-rose-100 rounded-full transition-colors disabled:cursor-not-allowed">
+                    <i data-lucide="chevron-right" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <!-- The Book Wrapper -->
+            <div class="book-wrapper" id="book-wrapper">
+                <div class="book-container" id="book-container">
+                    <!-- Base back cover for aesthetic shadow/background -->
+                    <div class="absolute top-0 right-0 w-1/2 h-full rounded-r-[16px] shadow-2xl" style="background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); z-index: 0;"></div>
+                    
+                    <!-- Dynamic Pages will be injected here -->
+                    <div id="dynamic-pages-container"></div>
+                </div>
+            </div>
+
+            <!-- Add/Edit Trigger & Form -->
+            <div id="add-trigger-container" class="mt-12 flex justify-center z-20">
+                <button onclick="openForm()" class="flex items-center gap-2 bg-white/80 backdrop-blur-md border border-rose-200 text-rose-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-rose-50 hover:shadow-lg transition-all shadow-sm">
+                    <i data-lucide="pen-tool" class="w-5 h-5"></i> 
+                    Add a New Memory
+                </button>
+            </div>
+
+            <div id="form-container" class="hidden w-full max-w-2xl px-4 mt-12 z-20">
+                <form id="memory-form" onsubmit="handleFormSubmit(event)" class="bg-white/90 backdrop-blur-xl p-8 rounded-3xl border border-rose-100 shadow-2xl animate-slide-up relative">
+                    <button type="button" onclick="closeForm()" class="absolute top-4 right-6 text-gray-400 hover:text-rose-500 font-bold text-xl">
+                        ×
+                    </button>
+                    
+                    <h4 id="form-title" class="text-2xl font-serif font-bold text-gray-800 mb-6 flex items-center gap-2">
+                        <i data-lucide="sparkles" class="w-6 h-6 text-rose-400"></i> New Diary Entry
+                    </h4>
+                    
+                    <div class="space-y-5">
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <input type="text" id="mem-date" class="px-5 py-3 rounded-xl border border-rose-200 bg-rose-50/30 focus:outline-none focus:ring-2 focus:ring-rose-400 flex-1 font-medium" placeholder="Date (e.g., Today)" required>
+                            <input type="text" id="mem-title" class="px-5 py-3 rounded-xl border border-rose-200 bg-rose-50/30 focus:outline-none focus:ring-2 focus:ring-rose-400 flex-[2] font-medium" placeholder="Title of memory" required>
+                        </div>
+                        
+                        <textarea id="mem-desc" class="w-full px-5 py-4 rounded-xl border border-rose-200 bg-rose-50/30 focus:outline-none focus:ring-2 focus:ring-rose-400 min-h-[120px] resize-y font-serif text-lg leading-relaxed" placeholder="Write your heart out..." required></textarea>
+
+                        <div class="flex gap-3 items-center">
+                            <div class="p-3 bg-rose-100 rounded-xl text-rose-500">
+                                <i data-lucide="camera" class="w-5 h-5"></i>
+                            </div>
+                            <input type="url" id="mem-img" class="flex-1 px-5 py-3 rounded-xl border border-rose-200 bg-rose-50/30 focus:outline-none focus:ring-2 focus:ring-rose-400 text-sm" placeholder="Paste Image URL here (Optional)">
+                        </div>
+
+                        <button type="submit" id="form-submit-btn" class="w-full bg-gradient-to-r from-rose-400 to-pink-500 text-white font-bold text-lg py-4 rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all">
+                            Save to Our Book
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Overthinking Cure -->
+        <section class="py-24 px-4 relative z-10 flex flex-col items-center justify-center">
+            <div class="max-w-3xl w-full text-center">
+                <div class="bg-white/40 backdrop-blur-xl border border-white/60 rounded-[3rem] p-8 md:p-14 shadow-2xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-rose-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+                    <div class="absolute bottom-0 left-0 w-64 h-64 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+                    
+                    <h2 class="text-3xl md:text-5xl font-serif font-bold text-gray-800 mb-4 relative z-10">
+                        The Overthinking Cure
+                    </h2>
+                    <p class="text-gray-600 mb-10 font-writing text-2xl relative z-10">
+                        Whenever your mind plays tricks on you, tap the button below.
+                    </p>
+                    
+                    <button onclick="handleCureClick()" class="relative inline-flex items-center justify-center px-10 py-5 font-bold text-white transition-all duration-300 bg-gradient-to-r from-rose-400 to-pink-500 rounded-full hover:scale-105 shadow-[0_0_30px_rgba(2fb,113,133,0.6)] hover:shadow-[0_0_40px_rgba(2fb,113,133,0.8)] z-20">
+                        <span class="relative flex items-center gap-3 text-lg">
+                            Am I too much to handle? <i data-lucide="star" class="w-5 h-5 fill-white animate-pulse"></i>
+                        </span>
+                    </button>
+
+                    <div class="mt-14 min-h-[160px] flex items-center justify-center relative z-10">
+                        <div class="w-full">
+                            <i data-lucide="quote" class="w-10 h-10 text-rose-300 mb-6 mx-auto opacity-50"></i>
+                            <p id="overthinking-text" class="text-2xl md:text-3xl font-serif text-gray-800 italic font-medium leading-relaxed fade-text active">
+                                <!-- Text populated via JS -->
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="relative z-10 py-10 text-center border-t border-rose-100/50 bg-white/30 backdrop-blur-sm">
+            <p class="text-gray-600 font-serif text-lg flex items-center justify-center gap-2">
+                Made with <i data-lucide="heart" class="w-5 h-5 text-rose-500 fill-rose-500 animate-pulse"></i> by Divyanshu
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Data Models
+        const REASSURANCES = [
+            "Tum too much nahi ho, tum meri favorite aadat ho. ❤️",
+            "Main tumhari har choti baat notice karta hoon, aur mujhe sab pasand hai. ✨",
+            "Pichle 3 saal ka har din tumhare sath special raha hai. 🗓️",
+            "Overthinking band karo, main kahin nahi jaa raha! 🔒",
+            "Tum mere liye perfect ho, exactly the way you are. 🌸",
+            "Suno, I love you more than words can say. 🥺",
+            "Tumhara smile dekh kar mera poora din ban jata hai. 😊",
+            "Agar tum overthink kar rahi ho, toh yaad rakhna I am always in your corner. 🫂",
+            "Tum mere life ki sabse khoobsurat reality ho. 🦋",
+            "Ghabrao mat, hum dono sath mil kar sab sort kar lenge. 🤝",
+            "Tumhari awaz mere liye sabse bada sukoon hai. 🎵",
+            "You are my safe place, meri jaan. 🏡",
+            "Kabhi doubt mat karna ki tum mere liye kitni important ho. 🌟",
+            "Tumhara gussa, tumhara pyaar, sab mujhe manzoor hai. 😌",
+            "Take a deep breath. Main hoon yahan. Hamesha. 💕"
+        ];
+
+        let memories = [
+            {
+                id: 1,
+                date: "The Day We Met",
+                title: "It all started here...",
+                description: "Jab pehli baar tumhein dekha, mujhe pata tha kuch magic hone wala hai. Tumhari hassi ne sab badal diya.",
+                image: "https://images.unsplash.com/photo-1518199266791-5375a8319d47?auto=format&fit=crop&q=80&w=400&h=300"
+            },
+            {
+                id: 2,
+                date: "Our First Date",
+                title: "Butterflies & Coffees",
+                description: "Hathon me hath, aur dher saari baatein. Wo sham main apni puri zindagi nahi bhool sakta.",
+                image: "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&q=80&w=400&h=300"
+            },
+            {
+                id: 3,
+                date: "1st Anniversary",
+                title: "One Year Down",
+                description: "Ek saal kaise beet gaya pata hi nahi chala. Tumhare sath har din ek celebration hai.",
+                image: "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&q=80&w=400&h=300"
+            },
+            {
+                id: 4,
+                date: "Today",
+                title: "3 Beautiful Years",
+                description: "3 saal baad bhi, butterflies waise hi hain jaise day one pe the. I love you to the moon and back.",
+                image: "https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?auto=format&fit=crop&q=80&w=400&h=300"
+            },
+            {
+                id: 5,
+                date: "Future Dreams",
+                title: "Beyond Tomorrow",
+                description: "Zindagi ke har moment tumhare sath hi hain. Humara future, tumhare saath hi bright hai.",
+                image: "https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?auto=format&fit=crop&q=80&w=400&h=300"
+            },
+            {
+                id: 6,
+                date: "Random Memory",
+                title: "Just Becouse",
+                description: "kabhi kabhi bas tumhari yaad ati hai aur dil me ek ajib si khusi hoti hai hai jo sabdo me baya nahi ki ja sakti ",
+                image: "add a link of any image "
+            },
+        ];
+
+        // State Variables
+        let currentPage = 0;
+        let sheets = [];
+        let editingId = null;
+        let autoPlayInterval = null;
+        let currentMessage = REASSURANCES[0];
+
+        // Init Setup
+        document.addEventListener("DOMContentLoaded", () => {
+            lucide.createIcons();
+            createFloatingHearts();
+            initAvatarAnimation();
+            
+            // Set initial overthinking text
+            document.getElementById('overthinking-text').innerText = `"${currentMessage}"`;
+            startAutoPlayCure();
+
+            // Book Responsiveness
+            window.addEventListener('resize', handleResize);
+        });
+
+        function createFloatingHearts() {
+            const container = document.getElementById('floating-hearts-container');
+            container.innerHTML = '';
+            for (let i = 0; i < 20; i++) {
+                const el = document.createElement('div');
+                el.className = 'absolute bottom-[-10%] animate-float text-pink-300';
+                el.style.left = `${Math.random() * 100}%`;
+                el.style.animationDuration = `${12 + Math.random() * 20}s`;
+                el.style.animationDelay = `${Math.random() * 10}s`;
+                el.style.transform = `scale(${0.3 + Math.random() * 0.8})`;
+                el.style.opacity = '0.4';
+                el.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>';
+                container.appendChild(el);
+            }
+        }
+
+        function initAvatarAnimation() {
+            const svg = document.getElementById('avatar-svg');
+            setTimeout(() => { svg.classList.add('step-1'); }, 1000);
+            setTimeout(() => { svg.classList.add('step-2'); }, 2200);
+        }
+
+        function enterMainApp() {
+            document.getElementById('welcome-screen').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            
+            renderBook();
+            handleResize(); // ensure correct scale upon viewing
+        }
+
+        function handleResize() {
+            const wrapper = document.getElementById('book-wrapper');
+            const container = document.getElementById('book-container');
+            if (wrapper && container) {
+                const parentW = wrapper.offsetWidth;
+                const bookW = 800; 
+                if (parentW < bookW) {
+                    const scale = (parentW / bookW) * 0.95; 
+                    container.style.transform = `scale(${scale})`;
+                } else {
+                    container.style.transform = `scale(1)`;
+                }
+            }
+        }
+
+        function getFloralCornerSVG(className) {
+            return `
+            <svg class="absolute w-16 h-16 opacity-20 text-amber-800 ${className}" viewBox="0 0 100 100">
+               <path d="M0,0 Q50,0 50,50 Q100,50 100,100" fill="none" stroke="currentColor" stroke-width="2"/>
+               <circle cx="20" cy="20" r="3" fill="currentColor"/>
+               <circle cx="80" cy="80" r="3" fill="currentColor"/>
+               <path d="M0,0 L20,30 L30,20 Z" fill="currentColor" opacity="0.5"/>
+            </svg>`;
+        }
+
+        function renderBook() {
+            // Generate sheets
+            sheets = [{ isCover: true, front: null, back: null }];
+            for (let i = 0; i < memories.length; i += 2) {
+                sheets.push({
+                    isCover: false,
+                    front: memories[i],
+                    back: memories[i+1] || null
+                });
+            }
+
+            // Build HTML
+            const container = document.getElementById('dynamic-pages-container');
+            let html = '';
+
+            sheets.forEach((sheet, index) => {
+                const isFlipped = currentPage > index;
+                const zIndex = isFlipped ? index : (sheets.length - index);
+                const flippedClass = isFlipped ? 'flipped' : '';
+
+                // Front Content
+                let frontHtml = '';
+                if (sheet.isCover) {
+                    frontHtml = `
+                    <div class="flex flex-col items-center justify-center h-full text-white p-8 relative overflow-hidden">
+                       <div class="absolute inset-2 border-2 border-white/30 rounded-xl pointer-events-none"></div>
+                       <i data-lucide="heart" class="w-16 h-16 text-white fill-white/20 mb-6 drop-shadow-md"></i>
+                       <h2 class="text-5xl font-serif font-bold text-center drop-shadow-lg mb-4">Our Diary</h2>
+                       <p class="font-writing text-3xl opacity-90 drop-shadow-md">Pragati & Divyanshu</p>
+                       <p class="absolute bottom-8 font-serif text-sm tracking-widest opacity-70">VOL. 1</p>
+                    </div>`;
+                } else if (sheet.front) {
+                    frontHtml = `
+                    <div class="flex flex-col h-full items-center relative group">
+                        <!-- Always visible Edit button -->
+                        <button onclick="editMemory(${sheet.front.id})" class="absolute -top-4 right-0 p-2 bg-white border border-rose-200 shadow-md text-rose-500 hover:text-rose-700 hover:bg-rose-100 rounded-full transition-all z-20" title="Edit memory">
+                            <i data-lucide="pencil" class="w-4 h-4"></i>
+                        </button>
+                        <p class="text-rose-400 font-writing text-2xl self-end mb-4 border-b border-rose-200 pb-1 pr-8 w-full text-right">${sheet.front.date}</p>
+                        
+                        <div class="polaroid w-[85%] max-w-[280px] mb-8">
+                           <div class="polaroid-tape"></div>
+                           <div class="bg-gray-100 w-full h-[180px] overflow-hidden rounded-sm">
+                              <img src="${sheet.front.image}" alt="Memory" class="w-full h-full object-cover" />
+                           </div>
+                           <p class="mt-4 font-writing text-center text-gray-700 text-2xl">${sheet.front.title}</p>
+                        </div>
+
+                        <p class="font-serif text-gray-700 text-lg leading-relaxed text-center px-4 overflow-y-auto hide-scrollbar" style="max-height: 120px;">
+                          ${sheet.front.description}
+                        </p>
+                    </div>`;
+                } else {
+                    frontHtml = `<div class="flex items-center justify-center h-full text-amber-800/30 font-writing text-2xl"><p>Blank Page</p></div>`;
+                }
+
+                // Back Content
+                let backHtml = '';
+                if (sheet.isCover) {
+                    backHtml = `
+                    <div class="flex flex-col justify-center items-center h-full">
+                        <h3 class="font-writing text-4xl text-amber-900 mb-6 text-center">To My Pragati,</h3>
+                        <p class="font-serif text-gray-700 text-lg leading-relaxed text-center italic px-8">
+                          "This book holds the chapters of us. The laughs, the dates, the quiet moments. <br/><br/> Every day with you is a page I want to read over and over again."
+                        </p>
+                    </div>`;
+                } else if (sheet.back) {
+                    backHtml = `
+                    <div class="flex flex-col h-full items-center relative group">
+                        <!-- Always visible Edit button -->
+                        <button onclick="editMemory(${sheet.back.id})" class="absolute -top-4 right-0 p-2 bg-white border border-rose-200 shadow-md text-rose-500 hover:text-rose-700 hover:bg-rose-100 rounded-full transition-all z-20" title="Edit memory">
+                            <i data-lucide="pencil" class="w-4 h-4"></i>
+                        </button>
+                        <p class="text-rose-400 font-writing text-2xl self-start mb-4 border-b border-rose-200 pb-1 w-full text-left pl-8">${sheet.back.date}</p>
+                        
+                        <div class="polaroid w-[85%] max-w-[280px] mb-8" style="transform: rotate(2deg)">
+                           <div class="polaroid-tape"></div>
+                           <div class="bg-gray-100 w-full h-[180px] overflow-hidden rounded-sm">
+                              <img src="${sheet.back.image}" alt="Memory" class="w-full h-full object-cover" />
+                           </div>
+                           <p class="mt-4 font-writing text-center text-gray-700 text-2xl">${sheet.back.title}</p>
+                        </div>
+
+                        <p class="font-serif text-gray-700 text-lg leading-relaxed text-center px-4 overflow-y-auto hide-scrollbar" style="max-height: 120px;">
+                          ${sheet.back.description}
+                        </p>
+                    </div>`;
+                } else {
+                    backHtml = `
+                    <div class="flex flex-col items-center justify-center h-full">
+                       <button onclick="openForm()" class="group flex flex-col items-center gap-3 p-6 border-2 border-dashed border-rose-200 rounded-2xl hover:border-rose-400 hover:bg-rose-50/50 transition-all">
+                         <div class="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center text-rose-500 group-hover:scale-110 transition-transform">
+                           <i data-lucide="pen-tool" class="w-6 h-6"></i>
+                         </div>
+                         <span class="font-writing text-2xl text-rose-400">Write a new memory...</span>
+                       </button>
+                    </div>`;
+                }
+
+                const frontClasses = sheet.isCover ? 'book-cover' : 'border-l border-amber-900/10 rounded-r-[12px]';
+                const backClasses = sheet.isCover ? 'rounded-l-[12px]' : 'border-r border-amber-900/10 rounded-l-[12px]';
+
+                html += `
+                <div class="book-page ${flippedClass}" id="page-${index}" style="z-index: ${zIndex}">
+                    <div class="page-front ${frontClasses}">
+                        ${sheet.isCover ? '' : `<div class="page-content">${getFloralCornerSVG('top-4 right-4 rotate-90')} ${getFloralCornerSVG('bottom-4 left-4 -rotate-90')} ${frontHtml}</div>`}
+                        ${sheet.isCover ? frontHtml : ''}
+                    </div>
+                    <div class="page-back ${backClasses}">
+                         <div class="page-content">
+                            ${getFloralCornerSVG('top-4 left-4')} ${getFloralCornerSVG('bottom-4 right-4 rotate-180')}
+                            ${backHtml}
+                         </div>
+                    </div>
+                </div>`;
+            });
+
+            container.innerHTML = html;
+            updateControls();
+            lucide.createIcons();
+        }
+
+        function turnNext() {
+            if (currentPage < sheets.length) {
+                const pageEl = document.getElementById(`page-${currentPage}`);
+                if (pageEl) {
+                    pageEl.classList.add('flipped');
+                    pageEl.style.zIndex = currentPage; // lower z-index when flipped
+                }
+                currentPage++;
+                updateControls();
+            }
+        }
+
+        function turnPrev() {
+            if (currentPage > 0) {
+                currentPage--;
+                const pageEl = document.getElementById(`page-${currentPage}`);
+                if (pageEl) {
+                    pageEl.classList.remove('flipped');
+                    pageEl.style.zIndex = sheets.length - currentPage; // restore z-index
+                }
+                updateControls();
+            }
+        }
+
+        function updateControls() {
+            document.getElementById('btn-prev').disabled = currentPage === 0;
+            document.getElementById('btn-next').disabled = currentPage === sheets.length;
+            
+            const indicator = document.getElementById('page-indicator');
+            if (currentPage === 0) {
+                indicator.innerText = "Cover";
+            } else {
+                indicator.innerText = `Page ${currentPage * 2 - 1}-${currentPage * 2}`;
+            }
+        }
+
+        function openForm() {
+            document.getElementById('add-trigger-container').classList.add('hidden');
+            document.getElementById('form-container').classList.remove('hidden');
+            
+            if (!editingId) {
+                const today = new Date();
+                document.getElementById('mem-date').value = today.toLocaleDateString('en-GB');
+                document.getElementById('mem-title').value = '';
+                document.getElementById('mem-desc').value = '';
+                document.getElementById('mem-img').value = '';
+                document.getElementById('form-title').innerHTML = '<i data-lucide="sparkles" class="w-6 h-6 text-rose-400"></i> New Diary Entry';
+            }
+            lucide.createIcons();
+            
+            // Scroll to form smoothly
+            document.getElementById('form-container').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function closeForm() {
+            document.getElementById('form-container').classList.add('hidden');
+            document.getElementById('add-trigger-container').classList.remove('hidden');
+            editingId = null;
+        }
+
+        function editMemory(id) {
+            const memory = memories.find(m => m.id === id);
+            if (memory) {
+                editingId = id;
+                document.getElementById('mem-date').value = memory.date;
+                document.getElementById('mem-title').value = memory.title;
+                document.getElementById('mem-desc').value = memory.description;
+                document.getElementById('mem-img').value = memory.image;
+                document.getElementById('form-title').innerHTML = '<i data-lucide="sparkles" class="w-6 h-6 text-rose-400"></i> Edit Diary Entry';
+                openForm();
+            }
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const date = document.getElementById('mem-date').value;
+            const title = document.getElementById('mem-title').value;
+            const desc = document.getElementById('mem-desc').value;
+            const img = document.getElementById('mem-img').value || "https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?auto=format&fit=crop&q=80&w=400&h=300";
+
+            if (editingId) {
+                const index = memories.findIndex(m => m.id === editingId);
+                if (index !== -1) {
+                    memories[index] = { ...memories[index], date, title, description: desc, image: img };
+                }
+            } else {
+                memories.push({
+                    id: Date.now(),
+                    date,
+                    title,
+                    description: desc,
+                    image: img
+                });
+            }
+
+            closeForm();
+            renderBook();
+        }
+
+        function changeOverthinkingMessage() {
+            const textEl = document.getElementById('overthinking-text');
+            
+            // Start exit transition
+            textEl.classList.remove('entering', 'active');
+            textEl.classList.add('exiting');
+            
+            setTimeout(() => {
+                // Change text while invisible
+                let newMessage = currentMessage;
+                while (newMessage === currentMessage) {
+                    const randomIndex = Math.floor(Math.random() * REASSURANCES.length);
+                    newMessage = REASSURANCES[randomIndex];
+                }
+                currentMessage = newMessage;
+                textEl.innerText = `"${currentMessage}"`;
+                
+                // Prep enter transition
+                textEl.classList.remove('exiting');
+                textEl.classList.add('entering');
+                
+                // Trigger enter animation (small delay for browser to register class change)
+                setTimeout(() => {
+                    textEl.classList.remove('entering');
+                    textEl.classList.add('active');
+                }, 50);
+
+            }, 600); // Matches CSS transition duration
+        }
+
+        function startAutoPlayCure() {
+            if (autoPlayInterval) clearInterval(autoPlayInterval);
+            autoPlayInterval = setInterval(changeOverthinkingMessage, 6000);
+        }
+
+        function handleCureClick() {
+            if (autoPlayInterval) {
+                clearInterval(autoPlayInterval);
+                autoPlayInterval = null;
+            }
+            changeOverthinkingMessage();
+        }
+    </script>
+</body>
+</html>
